@@ -8,7 +8,7 @@
 #include <math.h>
 
 #define MY_PI 3.14159265358979323846
-#define MAX 1000
+#define MAX 100
 
 void mySleep(int sleepMs); // Implementation after main()
 double radians(const double degrees) { return degrees*M_PI/180.0; }

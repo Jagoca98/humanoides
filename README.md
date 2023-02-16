@@ -2,7 +2,7 @@
 
 ## Webots :lady_beetle:
 
-This project contains the files needed to move Teo's robot arm. It contains two parts, the basic `teo_main_cpp` part that consists of moving the arm up and down in succession, and an extra part `teo_extra_cpp` that performs circular movements with the arm. This project is available as a git repository.
+This project contains the files needed to move Teo's robot arm. It contains two parts, the basic `teo_main_cpp` part that consists of moving the arm up and down in succession, and an extra part `teo_extra_cpp` that performs circular movements with the arm. In the assets folder you will find the videos of how the codes work. This project is available as a git repository.
 
 ```bash
 git clone https://github.com/Jagoca98/humanoides.git

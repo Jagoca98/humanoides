@@ -16,7 +16,7 @@ The file contains the functions for calculating the direct and inverse kinematic
 
 In this case a 2D circular trajectory has been implemented in the X-Z plane. Polar coordinates with a discretisation of $\theta$ between 0 and $2\pi$ have been used.
 
-$$\begin{cases} x = C_x + R\cdot \cos(\theta) \\ y = C_y + R\cdot \sin(\theta) \end{cases} \text{, with }  \theta \in \left[0,2\pi\right]$$
+$$\begin{cases} x = C_x + R\cdot \cos(\theta) & \\ y = C_y + R\cdot \sin(\theta) &  \end{cases} \text{, with }  \theta \in \left[0,2\pi\right]$$
 
 where $\left(C_x, C_y\right)$ is the center of the drawn circumference.
 

@@ -10,9 +10,8 @@
 #include <limits>
 
 #define MY_PI 3.14159265358979323846
-#define MAX 1000
-#define Vmax 0.5
-#define W 1000
+#define MAX 20
+#define Vmax 0.05
 
 void mySleep(int sleepMs); // Implementation after main()
 double radians(const double degrees) { return degrees*M_PI/180.0; }
@@ -21,7 +20,7 @@ double degrees(const double radians) { return radians*180.0/M_PI; }
 const double l0 = 0.329;
 const double l1 = 0.215+0.090;
 const double A = l0+l1;
-const double r = 0.07;
+const double r = 0.1;
 
 
 void fwdKin(const double q0, const double q1, double& x, double& z)
@@ -66,12 +65,12 @@ int main(int argc, char **argv)
   int timeStep = (int)robot->getBasicTimeStep();
   
   const int number = robot->getNumberOfDevices();
-  std::cout << number << std::endl;
+  // std::cout << number << std::endl;
   
   for(int i=0; i<number;i++){
     auto* tag = robot->getDeviceByIndex(i);
     std::string nombre = tag->getName();
-    std::cout << "Index " << i << " is a " << nombre << std::endl;
+    // std::cout << "Index " << i << " is a " << nombre << std::endl;
   }
   
   webots::PositionSensor* encoder_elbow = robot->getPositionSensor("r_elbow_pitch_sensor");
@@ -82,7 +81,9 @@ int main(int argc, char **argv)
   double theta [MAX];
   double target_q0;
   double target_q1;
-  double velocity[MAX];
+  double velocity[2];
+  double target_x[MAX];
+  double target_z[MAX];
 
   // target 0
 
@@ -98,36 +99,51 @@ int main(int argc, char **argv)
   fwdKin(target0_q0, target0_q1, target0_x, target0_z);
   
   
-  for(int i=0; i<MAX; i++){
+  for(int i=0; i<(MAX); i++){
     theta[i]=2*MY_PI*i/(MAX-1);
-    velocity[i] = Vmax*sin(W*theta[i]);
+    std::cout << theta[i] << std::endl;
+    target_x[i] = target0_x + r*cos(theta[i]);
+    target_z[i] = target0_z+0.1 + r*sin(theta[i]);
+    // std::cout << target_x[i] << ", " << target_z[i] << std::endl;
   }
+
+  motor_q0->setPosition(target0_q0);
+  motor_q1->setPosition(target0_q1);
+  robot->step(1000);
+  mySleep(1000);
 
 
   motor_q0->setVelocity(0.0);
   motor_q1->setVelocity(0.0);
   motor_q0->setPosition(std::numeric_limits<double>::infinity());
   motor_q1->setPosition(std::numeric_limits<double>::infinity());
+  
+
 
   int i = 0;
    
   while(true){
     if(i>=MAX){
-      i = 0;
+      i = 1;
     }
     
     double theta0 = encoder_shoulder->getValue();
     double theta1 = encoder_elbow->getValue();
     angle_corrector(theta0, target_q0);
     angle_corrector(theta1, target_q1);
-    std::cout << "targe q0: " <<target_q0 << ", target q1: " << target_q1 << std::endl;
+    // std::cout << "targe q0: " <<target_q0 << ", target q1: " << target_q1 << std::endl;
+    double measured_x, measured_z;
+    fwdKin(target_q0, target_q1, measured_x, measured_z);
+     
+    velocity[0] = Vmax * (target_x[i]-measured_x)/timeStep*1000;
+    velocity[1] = Vmax * (target_z[i]-measured_z)/timeStep*1000;
     
     double J_inv11 = -sin(target_q0 + target_q1)/(l0*cos(target_q0 + target_q1)*sin(target_q0) - l0*sin(target_q0 + target_q1)*cos(target_q0));
     double J_inv12 = cos(target_q0 + target_q1)/(l0*cos(target_q0 + target_q1)*sin(target_q0) - l0*sin(target_q0 + target_q1)*cos(target_q0));
     double J_inv21 = (l1*sin(target_q0 + target_q1) + l0*sin(target_q0))/(l0*l1*cos(target_q0 + target_q1)*sin(target_q0) - l0*l1*sin(target_q0 + target_q1)*cos(target_q0));
     double J_inv22 = -(l1*cos(target_q0 + target_q1) + l0*cos(target_q0))/(l0*l1*cos(target_q0 + target_q1)*sin(target_q0) - l0*l1*sin(target_q0 + target_q1)*cos(target_q0));
-    double w0 =  J_inv11 * velocity[i] + J_inv12 * velocity[i];
-    double w1 =  J_inv21 * velocity[i] + J_inv22 * velocity[i];
+    double w0 =  J_inv11 * velocity[0] + J_inv12 * velocity[1];
+    double w1 =  J_inv21 * velocity[0] + J_inv22 * velocity[1];
     // std::cout << w0 << ", " << w1 << std::endl;
     
     
@@ -136,7 +152,7 @@ int main(int argc, char **argv)
     
     if(-1 == robot->step(1000))
         break;
-    // mySleep(1000);
+    mySleep(1000);
     i++;
   }
   

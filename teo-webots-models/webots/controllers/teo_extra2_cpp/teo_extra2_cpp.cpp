@@ -11,7 +11,7 @@
 
 #define MY_PI 3.14159265358979323846
 #define MAX 20
-#define Vmax 0.05
+#define Vmax 0.05 // m/s
 
 void mySleep(int sleepMs); // Implementation after main()
 double radians(const double degrees) { return degrees*M_PI/180.0; }
@@ -137,6 +137,7 @@ int main(int argc, char **argv)
      
     velocity[0] = Vmax * (target_x[i]-measured_x)/timeStep*1000;
     velocity[1] = Vmax * (target_z[i]-measured_z)/timeStep*1000;
+    std::cout << "Velocidad en X: " << velocity[0] << ", Velocidad en Y: " << velocity[1] << std::endl;
     
     double J_inv11 = -sin(target_q0 + target_q1)/(l0*cos(target_q0 + target_q1)*sin(target_q0) - l0*sin(target_q0 + target_q1)*cos(target_q0));
     double J_inv12 = cos(target_q0 + target_q1)/(l0*cos(target_q0 + target_q1)*sin(target_q0) - l0*sin(target_q0 + target_q1)*cos(target_q0));
@@ -144,7 +145,7 @@ int main(int argc, char **argv)
     double J_inv22 = -(l1*cos(target_q0 + target_q1) + l0*cos(target_q0))/(l0*l1*cos(target_q0 + target_q1)*sin(target_q0) - l0*l1*sin(target_q0 + target_q1)*cos(target_q0));
     double w0 =  J_inv11 * velocity[0] + J_inv12 * velocity[1];
     double w1 =  J_inv21 * velocity[0] + J_inv22 * velocity[1];
-    // std::cout << w0 << ", " << w1 << std::endl;
+    std::cout << "Velocidad en q0: " <<  w0 << ", Velocidad en q1: " << w1 << std::endl;
     
     
     motor_q0->setVelocity(w0);

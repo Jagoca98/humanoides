@@ -22,6 +22,10 @@ y = C_y + R\cdot \sin(\theta) & \end{cases} \text{, with }  \theta \in \left[0,2
 where $\left(C_x, C_y\right)$ is the center of the drawn circumference.
 
 
+### `teo_extra2_cpp`
+
+In this case, Teo will perform the same trajectory but it will be with a velocity control instead with the position control. To do this, the Jacobian matrix relating Cartesian velocities to joint velocities is needed.
+
 
 
 
